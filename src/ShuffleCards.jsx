@@ -308,7 +308,7 @@ export default function ShuffleCards() {
   const [shuffledCards, setShuffledCards] = useState(cardContents);
   const [isShuffling, setIsShuffling] = useState(false);
 
-  const shuffleCards = () => {
+  const shuffleCard = () => {
     setIsShuffling(true);
     setTimeout(() => {
       setShuffledCards([...cardContents].sort(() => Math.random() - 0.5));
@@ -319,7 +319,7 @@ export default function ShuffleCards() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-pink-100 relative">
       <button
-        onClick={shuffleCards}
+        onClick={shuffleCard}
         className="mb-6 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-full shadow-lg hover:scale-105 transition-transform z-20 text-lg md:text-xl lg:text-2xl"
       >
         Shuffle ✨
@@ -335,22 +335,8 @@ export default function ShuffleCards() {
           {shuffledCards.map((card, index) => (
             <motion.div
               key={index}
-              initial={{ y: 0, opacity: 1 }}
-              animate={
-                isShuffling
-                  ? {
-                      y: [0, -20, 20, -20, 20, 0],
-                      opacity: [1, 0.8, 1, 0.8, 1],
-                      scale: [1, 1.05, 1, 1.05, 1],
-                      rotate: [0, 5, -5, 5, -5, 0],
-                    }
-                  : { y: 0, opacity: 1, scale: 1, rotate: 0 }
-              }
-              transition={{
-                duration: 1,
-                ease: "easeInOut",
-                delay: index * 0.05,
-              }}
+              animate={isShuffling ? { y: [0, -10, 10, -10, 10, 0], opacity: [1, 0.7, 1] } : { y: 0, opacity: 1 }}
+              transition={{ duration: 1, ease: "easeInOut", delay: index * 0.02 }}
               className="absolute w-full h-full bg-white rounded-2xl flex flex-col items-center justify-center p-8 border-4 border-pink-300 bg-gradient-to-r from-yellow-100 to-pink-100 shadow-md"
             >
               {card}
