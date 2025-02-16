@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from 'framer-motion';
 
 const cardContents = [
@@ -304,47 +304,115 @@ const cardContents = [
   "The world is better because you’re in it."
 ];
 
-export default function ShuffleCards() {
-  const [shuffledCards, setShuffledCards] = useState(cardContents);
+const ShuffleCards = () => {
+  const [currentCard, setCurrentCard] = useState(cardContents[0]);
   const [isShuffling, setIsShuffling] = useState(false);
 
-  const shuffleCard = () => {
+  const shuffleCards = () => {
+    if (isShuffling) return;
     setIsShuffling(true);
+
+    let newCard;
+    do {
+      newCard = cardContents[Math.floor(Math.random() * cardContents.length)];
+    } while (newCard === currentCard);
+
+    setCurrentCard(null);
+    
     setTimeout(() => {
-      setShuffledCards([...cardContents].sort(() => Math.random() - 0.5));
+      setCurrentCard(newCard);
       setIsShuffling(false);
-    }, 1000);
+    }, 300);
+  };
+
+  const cardVariants = {
+    initial: { rotateY: -90, opacity: 0, scale: 0.5 },
+    animate: { rotateY: 0, opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" } },
+    exit: { rotateY: 90, opacity: 0, scale: 0.5, transition: { duration: 0.3, ease: "easeIn" } }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-pink-100 relative">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-pink-200 to-purple-300">
       <button
-        onClick={shuffleCard}
-        className="mb-6 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-full shadow-lg hover:scale-105 transition-transform z-20 text-lg md:text-xl lg:text-2xl"
+        onClick={shuffleCards}
+        disabled={isShuffling}
+        className="mb-12 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-full shadow-lg hover:scale-105 transition-transform text-lg disabled:opacity-50"
       >
         Shuffle ✨
       </button>
 
-      <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl h-64 mb-6">
-        <motion.div
-          initial={{ rotate: 0 }}
-          animate={isShuffling ? { rotate: [0, 10, -10, 10, -10, 0] } : { rotate: 0 }}
-          transition={{ duration: 1, ease: "easeInOut" }}
-          className="relative w-full h-full"
-        >
-          {shuffledCards.map((card, index) => (
-            <motion.div
-              key={index}
-              animate={isShuffling ? { y: [0, -10, 10, -10, 10, 0], opacity: [1, 0.7, 1] } : { y: 0, opacity: 1 }}
-              transition={{ duration: 1, ease: "easeInOut", delay: index * 0.02 }}
-              className="absolute w-full h-full bg-white rounded-2xl flex flex-col items-center justify-center p-8 border-4 border-pink-300 bg-gradient-to-r from-yellow-100 to-pink-100 shadow-md"
-            >
-              {card}
-            </motion.div>
+      <div className="relative w-64 h-96 perspective-1000">
+  <AnimatePresence mode="wait">
+    {currentCard && (
+      <motion.div
+        key={currentCard}
+        className="absolute inset-0 rounded-2xl flex flex-col items-center justify-center p-6 shadow-purple-900 shadow-2xl overflow-hidden"
+        variants={cardVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+      >
+        {/* Gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 opacity-90" />
+        
+        {/* Glossy overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent mix-blend-overlay" />
+
+        {/* Card content */}
+        <div className="relative z-10 w-full h-full flex flex-col items-center justify-center space-y-4 text-center">
+          {/* Decorative top icon */}
+          <div className="absolute top-4 right-4 text-white/30">
+            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z"/>
+            </svg>
+          </div>
+
+          {/* Main text */}
+          <span className="text-3xl font-bold bg-gradient-to-r from-white to-pink-100 bg-clip-text text-transparent px-4">
+            {currentCard}
+          </span>
+
+          {/* Decorative divider */}
+          <div className="w-16 h-1 bg-white/30 rounded-full" />
+
+          {/* Animated bottom element */}
+          <motion.div
+            className="absolute bottom-6 w-12 h-1 bg-white/50 rounded-full"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [1, 0.8, 1]
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+
+        {/* Sparkle particles */}
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-white/50 rounded-full"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                transform: `scale(${Math.random()})`
+              }}
+            />
           ))}
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+</div>
     </div>
   );
-}
+};
+
+export default ShuffleCards;
+
+
 
